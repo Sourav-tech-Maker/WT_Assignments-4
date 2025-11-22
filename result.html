@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            margin: 40px;
+        }
+        .card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #1f4f8b;
+        }
+        .score {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .detail {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: #1f4f8b;
+            color: #fff;
+            text-decoration: none;
+        }
+        h2 {
+            color: #1f4f8b;
+            margin-top: 25px;
+            border-bottom: 1px solid #dde3f1;
+            padding-bottom: 4px;
+        }
+        .answer-block {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #f7f8ff;
+            border-radius: 6px;
+        }
+        .answer-block p {
+            margin: 4px 0;
+        }
+        .answer-label {
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 4px 0 0 0;
+        }
+        .input-field {
+            margin-top: 15px;
+        }
+        input[type="text"] {
+            padding: 6px;
+            width: 96%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Your Quiz Result</h1>
+
+    <div id="userDetails">
+        <div class="input-field">
+            <label><strong>Name:</strong></label><br>
+            <input type="text" id="studentName" placeholder="Enter your full name">
+        </div>
+        <div class="input-field">
+            <label><strong>Enrollment No.:</strong></label><br>
+            <!-- Numeric only, max 10 characters -->
+            <input type="text"
+                   id="enrollNo"
+                   placeholder="Enter your enrollment number"
+                   maxlength="10"
+                   inputmode="numeric">
+        </div>
+        <button id="showResultBtn" class="btn">Show My Result</button>
+    </div>
+
+    <div id="resultBox" class="detail" style="display:none;">
+        Loading result...
+    </div>
+
+    <a href="index.html" class="btn">Go Back to Quiz</a>
+</div>
+
+<script>
+    const data = localStorage.getItem("quizResult");
+    const box = document.getElementById("resultBox");
+    const showResultBtn = document.getElementById("showResultBtn");
+    const enrollInput = document.getElementById("enrollNo");
+
+    // Allow only numeric input (0-9) in the enrollment field
+    enrollInput.addEventListener("input", function () {
+        this.value = this.value.replace(/[^0-9]/g, ""); // remove any non-digit
+    });
+
+    showResultBtn.addEventListener("click", function() {
+        const name = document.getElementById("studentName").value.trim();
+        const enroll = enrollInput.value.trim();
+
+        // 1) Check name filled
+        if (name === "") {
+            alert("⚠️ Please enter your Name to view your result!");
+            return;
+        }
+
+        // 2) Check enrollment rules:
+        // - only digits
+        // - length between 9 and 10
+        const enrollPattern = /^\d{9,10}$/;
+
+        if (!enrollPattern.test(enroll)) {
+            alert("⚠️ Please enter a valid Enrollment Number (numeric only, 9 or 10 digits).");
+            return;
+        }
+
+        if (!data) {
+            box.style.display = "block";
+            box.innerHTML = "No quiz result found. Please attempt the quiz first.";
+            return;
+        }
+
+        const result = JSON.parse(data);
+        const score = result.score;
+        const total = result.totalQuestions;
+
+        let msg = "<p><strong>Name:</strong> " + name +
+                  "<br><strong>Enrollment No.:</strong> " + enroll + "</p>";
+
+        msg += "<p class='score'>You scored " + score + " out of " + total + ".</p>";
+
+        const percent = Math.round((score / total) * 100);
+        msg += "<p><strong>Percentage:</strong> " + percent + "%</p>";
+
+        if (percent === 100) {
+            msg += "<p>🌟 Excellent! You got all the MCQs correct. Great understanding of the concepts!</p>";
+        } else if (percent >= 70) {
+            msg += "<p>👏 Good job! You passed with a strong score. Review the tricky ones for even better clarity.</p>";
+        } else {
+            msg += "<p>💡 Keep practicing! Some questions need more attention. Don’t give up!</p>";
+        }
+
+        // Written answers
+        const ans7 = result.ans7 || "";
+        const ans8 = result.ans8 || "";
+        const ans9 = result.ans9 || "";
+        const ans10 = result.ans10 || "";
+
+        msg += "<h2>Your Written Answers (Q7 – Q10)</h2>";
+
+        msg += "<div class='answer-block'><p class='answer-label'>Q7:</p><pre>" +
+               (ans7 || "No answer given.") + "</pre></div>";
+        msg += "<div class='answer-block'><p class='answer-label'>Q8:</p><pre>" +
+               (ans8 || "No answer given.") + "</pre></div>";
+        msg += "<div class='answer-block'><p class='answer-label'>Q9:</p><pre>" +
+               (ans9 || "No answer given.") + "</pre></div>";
+        msg += "<div class='answer-block'><p class='answer-label'>Q10:</p><pre>" +
+               (ans10 || "No answer given.") + "</pre></div>";
+
+        box.style.display = "block";
+        box.innerHTML = msg;
+    });
+</script>
+
+</body>
+</html>
