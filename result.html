@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            margin: 40px;
+        }
+        .card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #1f4f8b;
+        }
+        .score {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .detail {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: #1f4f8b;
+            color: #fff;
+            text-decoration: none;
+        }
+        h2 {
+            color: #1f4f8b;
+            margin-top: 25px;
+            border-bottom: 1px solid #dde3f1;
+            padding-bottom: 4px;
+        }
+        .answer-block {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #f7f8ff;
+            border-radius: 6px;
+        }
+        .answer-block p {
+            margin: 4px 0;
+        }
+        .answer-label {
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 4px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Your Quiz Result</h1>
+    <div id="resultBox" class="detail">
+        Loading result...
+    </div>
+    <a href="index.html" class="btn">Go Back to Quiz</a>
+</div>
+
+<script>
+    // Read stored result from localStorage
+    const data = localStorage.getItem("quizResult");
+    const box = document.getElementById("resultBox");
+
+    if (!data) {
+        box.innerHTML = "No quiz result found. Please attempt the quiz first.";
+    } else {
+        const result = JSON.parse(data);
+        const score = result.score;
+        const total = result.totalQuestions;
+
+        let msg = "";
+
+        // Score & percentage
+        msg += "<p class='score'>You scored " + score + " out of " + total + ".</p>";
+
+        const percent = Math.round((score / total) * 100);
+        msg += "<p><strong>Percentage:</strong> " + percent + "%</p>";
+
+        // Simple feedback message
+        if (percent === 100) {
+            msg += "<p>Excellent! You got all the MCQs correct. Great understanding of the concepts.</p>";
+        } else if (percent >= 70) {
+            msg += "<p>Good job! You passed with a strong score. Review the questions you missed for even better clarity.</p>";
+        } else {
+            msg += "<p>Keep practicing! Some of the tricky concepts need a bit more revision.</p>";
+        }
+
+        // Show written answers for Q7–Q10
+        const ans7 = result.ans7 || "";
+        const ans8 = result.ans8 || "";
+        const ans9 = result.ans9 || "";
+        const ans10 = result.ans10 || "";
+
+        msg += "<h2>Your Written Answers (Q7 – Q10)</h2>";
+
+        msg += "<div class='answer-block'>" +
+               "<p class='answer-label'>Q7: CSS Specificity & Final Text Color</p>" +
+               "<pre>" + (ans7 ? ans7 : "No answer given.") + "</pre>" +
+               "</div>";
+
+        msg += "<div class='answer-block'>" +
+               "<p class='answer-label'>Q8: Visibility and Click Behavior</p>" +
+               "<pre>" + (ans8 ? ans8 : "No answer given.") + "</pre>" +
+               "</div>";
+
+        msg += "<div class='answer-block'>" +
+               "<p class='answer-label'>Q9: Async Script Loading Order</p>" +
+               "<pre>" + (ans9 ? ans9 : "No answer given.") + "</pre>" +
+               "</div>";
+
+        msg += "<div class='answer-block'>" +
+               "<p class='answer-label'>Q10: 0 == \"0\" vs 0 === \"0\"</p>" +
+               "<pre>" + (ans10 ? ans10 : "No answer given.") + "</pre>" +
+               "</div>";
+
+        box.innerHTML = msg;
+    }
+</script>
+
+</body>
+</html>
